@@ -6,35 +6,43 @@ public class Bunny : MonoBehaviour {
     public delegate void OnDied(Bunny bunny);
     public event OnDied onDied;
 
+    public delegate void OnPairing(Bunny bunny);
+    public event OnPairing onPairing;
+
     //State from 0...1 --> initial 0-0.5
     public float state;
 	public float stateChangeSpeed;
 	private int direction = 1 ; // 1 == incrementing, -1 decrementing
 
-    
+    [Range(0.0f, 1.0f)]
+    public float pairingThreshold;
     public float forceAmmount;
 
     public Renderer render;
 
     public float tempPerCollision;
-    float temperature = 0.0f;
+    float mTemperature = 0.0f;
+    public float temperature { get { return mTemperature; } }
 
     private float angle; 
 	private Vector3 position; 
 	private float acceleration;
     private Rigidbody rb;
+    public Animator animator;
+    private bool mayPair = false;
 
     public bool debugEnabled;
 	// Use this for initialization
 	void Start () {
-		initialize ();
+        initialize ();
         StartCoroutine(pulsingMovement());
-	}
+        enableMayPair(0.2f);
+    }
 	
 	// Update is called once per frame
 	void Update () {
 
-        state += stateChangeSpeed * direction;
+        state += stateChangeSpeed * direction * Time.deltaTime;
         if (state < 0.0f || state > 1.0f)
             direction *= -1;
 
@@ -43,6 +51,14 @@ public class Bunny : MonoBehaviour {
         if (debugEnabled) {
 			Debug.Log ("State changin: " + this.state);
 		}
+
+        if (rb.velocity.y > 0.1f)
+        {
+            animator.SetTrigger("fall");
+        }else if(rb.velocity.sqrMagnitude < 0.1f)
+        {
+            animator.SetTrigger("idle");
+        }
 
         if (transform.position.y < -10.0f)
         {
@@ -69,33 +85,70 @@ public class Bunny : MonoBehaviour {
             force.y = 0.0f;
 
             rb.AddForce(force.normalized * forceAmmount);
-            yield return new WaitForSeconds(Random.Range(0.5f, 1.5f));
+            animator.SetTrigger("run");
+            yield return new WaitForSeconds(Random.Range(1.0f, 2.5f));
         }
     }
 
+
+    void setTemperature(float temperature)
+    {
+        mTemperature = Mathf.Clamp01(temperature);
+        Color c = Color.Lerp(Color.green, Color.red, temperature);
+        Material[] mats = render.materials;
+        mats[0].color = c;
+        mats[1].color = c;
+        render.materials = mats;
+
+        if (mTemperature >= 1.0f && onDied != null)
+            onDied(this);
+    }
+
+    public void reduceTemperature(float ammount)
+    {
+        setTemperature(mTemperature - ammount);
+    }
 
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("bunny"))
         {
             Debug.Log("---OnTriggerEnter---Bunny---");
-            temperature += tempPerCollision;
-            Color c = Color.Lerp(Color.green, Color.red, temperature);
-            Material[] mats = render.materials;
-            mats[0].color = c;
-            mats[1].color = c;
-            render.materials = mats;
+            setTemperature(mTemperature + tempPerCollision);
+            animator.SetTrigger("knockback");
+            animator.SetTrigger("run");
+
+            Bunny other = collision.gameObject.GetComponent<Bunny>();
+            if(mayPair && other.mayPair && mTemperature < pairingThreshold && other.mTemperature < pairingThreshold)
+            {
+                if (onPairing != null)
+                    onPairing(this);
+
+                enableMayPair(0.2f);
+            }
+
         }
         else if (collision.gameObject.CompareTag("pylon"))
         {
             Debug.Log("---OnTriggerEnter---pylon---");
-            temperature += tempPerCollision *1.5f;
-            Color c = Color.Lerp(Color.green, Color.red, temperature);
-            Material[] mats = render.materials;
-            mats[0].color = c;
-            mats[1].color = c;
-            render.materials = mats;
+            setTemperature(mTemperature + tempPerCollision * 1.5f);
+            animator.SetTrigger("knockback");
+            animator.SetTrigger("run");
         }
     }
 
+    Coroutine enableMayPairCo;
+    void enableMayPair(float delay)
+    {
+        if (enableMayPairCo != null)
+            StopCoroutine(enableMayPairCo);
+
+        enableMayPairCo = StartCoroutine(doEnableMayPair(delay));
+    }
+
+    IEnumerator doEnableMayPair(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        mayPair = true;
+    }
 }

@@ -19,7 +19,7 @@ public class BunnyController : MonoBehaviour {
 
     void Start () {
 		SpawnBunnies ();
-        StartCoroutine(spawnMoreBunnies(0.5f));
+        StartCoroutine(spawnMoreBunnies(1.5f));
 	}
 
 	// Update is called once per frame
@@ -55,6 +55,7 @@ public class BunnyController : MonoBehaviour {
         mBunnies.Add(b);
 
         b.onDied += bunnyDied;
+        b.onPairing += bunnyPaired;
 
         return b;
     }
@@ -62,10 +63,16 @@ public class BunnyController : MonoBehaviour {
     void bunnyDied(Bunny bunny)
     {
         bunny.onDied -= bunnyDied;
+        bunny.onPairing += bunnyPaired;
         mBunnies.Remove(bunny);
         Destroy(bunny.gameObject);
     }
 
+    void bunnyPaired(Bunny bunny)
+    {
+        Debug.Log("-------------bunnyPaired----------------");
+        GenerateBunny(bunny.transform.position);
+    }
 
 	//generate 3D position on top of game area! 
 	Vector3 generateRandomPosition() {
@@ -104,11 +111,20 @@ public class BunnyController : MonoBehaviour {
         {
             Vector3 point = ray.GetPoint(hit.distance);
 
+            // cool near bunnies down
+            foreach (Bunny bunny in bunnies)
+            {
+                if(Vector3.Distance(point, bunny.transform.position) <= 5.0f)
+                {
+                    bunny.reduceTemperature(1.0f);
+                }
+            }
+
             // temp sphere to see where hit
-            GameObject s = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            s.transform.position = point;
-            s.transform.localScale = Vector3.one * 5.0f;
-            Destroy(s, 1.0f);
+            //GameObject s = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            //s.transform.position = point;
+            //s.transform.localScale = Vector3.one * 5.0f;
+            //Destroy(s, 1.0f);
         }
     }
 
