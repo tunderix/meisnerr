@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class BunnyController : MonoBehaviour {
 
 	public GameObject bunnyPrefab;
-	public GameObject levitatingTerrain; 
 
 	//Parameters for spawning new bunnies! 
 	public int quantity;
@@ -17,6 +16,8 @@ public class BunnyController : MonoBehaviour {
 
 	void Start () {
 		SpawnBunnies ();
+
+        StartCoroutine(spawnMoreBunnies(0.5f));
 	}
 
 	// Update is called once per frame
@@ -46,7 +47,7 @@ public class BunnyController : MonoBehaviour {
 	}
 
 	void GenerateBunny (Vector3 spawnPoint) {
-		GameObject.Instantiate (bunnyPrefab, spawnPoint, bunnyPrefab.transform.rotation); 
+		GameObject.Instantiate (bunnyPrefab, spawnPoint, bunnyPrefab.transform.rotation);
 	}
 
 
@@ -60,4 +61,24 @@ public class BunnyController : MonoBehaviour {
 		Debug.Log ("Generating random pos: " + randomPos.ToString());
 		return randomPos;
 	}
+
+
+
+    IEnumerator spawnMoreBunnies(float interval)
+    {
+        while(true)
+        {
+            GameObject go = Instantiate(bunnyPrefab);
+            Vector3 pos = Random.insideUnitSphere * radius;
+            pos.y = 10.0f;
+            go.transform.position = pos;
+
+            Rigidbody rb = go.GetComponent<Rigidbody>();
+            pos.y = 0.0f;
+            rb.AddForce(-pos * 50f);
+
+            yield return new WaitForSeconds(interval);
+        }
+    }
+
 }
