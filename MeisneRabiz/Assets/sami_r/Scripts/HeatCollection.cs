@@ -5,6 +5,10 @@ public class HeatCollection : MonoBehaviour {
 
 	public List<Texture2D> textures;
 
+	private float spotAngle; //30 - 70
+	private float intensity; //0 - 3
+
+
 	// Use this for initialization
 	void Start () {
 		
