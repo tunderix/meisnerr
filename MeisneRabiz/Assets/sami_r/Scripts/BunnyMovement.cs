@@ -1,15 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BunnySpawnController : MonoBehaviour {
-
-	public GameObject bunnyPrefab; 
-	public int quantity;
-	public int thickness; 
+public class BunnyMovement : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+	
 	}
 	
 	// Update is called once per frame
