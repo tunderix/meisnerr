@@ -11,12 +11,13 @@ public class BunnyController : MonoBehaviour {
 	public int thickness; 
 	public float radius;
 
-	//Parameters for handling bunnies. 
-	private Bunny[] bunnies; 
+    //Parameters for handling bunnies.
+    private List<Bunny> mBunnies = new List<Bunny>();
+    private List<Bunny> bunnies { get { return mBunnies; } }
 
-	void Start () {
+
+    void Start () {
 		SpawnBunnies ();
-
         StartCoroutine(spawnMoreBunnies(0.5f));
 	}
 
@@ -46,9 +47,23 @@ public class BunnyController : MonoBehaviour {
 		}
 	}
 
-	void GenerateBunny (Vector3 spawnPoint) {
-		GameObject.Instantiate (bunnyPrefab, spawnPoint, bunnyPrefab.transform.rotation);
-	}
+    Bunny GenerateBunny (Vector3 spawnPoint) {
+        GameObject go = Instantiate(bunnyPrefab, spawnPoint, bunnyPrefab.transform.rotation) as GameObject;
+
+        Bunny b = go.GetComponent<Bunny>();
+        mBunnies.Add(b);
+
+        b.onDied += bunnyDied;
+
+        return b;
+    }
+
+    void bunnyDied(Bunny bunny)
+    {
+        bunny.onDied -= bunnyDied;
+        mBunnies.Remove(bunny);
+        Destroy(bunny.gameObject);
+    }
 
 
 	//generate 3D position on top of game area! 
@@ -62,18 +77,15 @@ public class BunnyController : MonoBehaviour {
 		return randomPos;
 	}
 
-
-
     IEnumerator spawnMoreBunnies(float interval)
     {
         while(true)
         {
-            GameObject go = Instantiate(bunnyPrefab);
             Vector3 pos = Random.insideUnitSphere * radius;
             pos.y = 10.0f;
-            go.transform.position = pos;
+            Bunny bunny = GenerateBunny(pos);
 
-            Rigidbody rb = go.GetComponent<Rigidbody>();
+            Rigidbody rb = bunny.GetComponent<Rigidbody>();
             pos.y = 0.0f;
             rb.AddForce(-pos * 50f);
 
