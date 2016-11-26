@@ -7,12 +7,16 @@ public class PylonController : MonoBehaviour {
     public GameObject pylonPrefab;
     public int pylonCount;
 
-    List<Pylon> pylons;
+    List<Pylon> mPylons;
+    public List<Pylon> pylons {
+        get { return mPylons; }
+    }
 
-	// Use this for initialization
-	void Start () {
-        pylons = new List<Pylon>();
+    // Use this for initialization
+    void Start () {
+        mPylons = new List<Pylon>();
         CreatePylon(pylonCount);
+        StartCoroutine(randomPylonStateChange());
     }
 	
 	// Update is called once per frame
@@ -20,31 +24,42 @@ public class PylonController : MonoBehaviour {
 	
 	}
 
-
     void CreatePylon(int count)
     {
-        Vector3 rot = Vector3.zero;
+        float rot = 0.0f;
         for (int i = 0; i < count; ++i)
         {
             GameObject pylonGo = Instantiate(pylonPrefab);
             pylonGo.transform.SetParent(transform, false);
+            pylonGo.transform.localPosition = Vector3.zero;
 
             Pylon pylon = pylonGo.GetComponent<Pylon>();
-            pylons.Add(pylon);
-            pylon.state = i % 2 == 0 ? PylonState.s0 : PylonState.s1;
+            mPylons.Add(pylon);
+            pylon.state = i % 2;
 
-            rot.y = i * (360 / count);
-            pylon.setRotate(rot);
+            rot = i * (360 / count);
+            pylon.setRotateY(rot);
 
             if (i > 0)
             {
-                pylon.pylonLeft = pylons[i - 1];
-                pylons[i - 1].pylonRigth = pylon;
+                pylon.pylonLeft = mPylons[i - 1];
+                mPylons[i - 1].pylonRigth = pylon;
             }
         }
 
-        pylons[0].pylonLeft = pylons[count - 1];
-        pylons[count - 1].pylonRigth = pylons[0];
+        mPylons[0].pylonLeft = mPylons[count - 1];
+        mPylons[count - 1].pylonRigth = mPylons[0];
+    }
+
+    IEnumerator randomPylonStateChange()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(Random.Range(3.0f, 6.0f));
+
+            Pylon pylon = mPylons[Random.Range(0, mPylons.Count)];
+            pylon.changePylonState(Random.value > 0.4f, 10.0f);
+        }
     }
 
 }
