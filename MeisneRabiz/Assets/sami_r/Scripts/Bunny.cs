@@ -49,6 +49,10 @@ public class Bunny : MonoBehaviour {
         if (debugEnabled) {
 			Debug.Log ("State changin: " + this.state);
 		}
+
+        if (transform.position.y < -10.0f)
+            Destroy(gameObject);
+
 	}
 
 	private void initialize () {
