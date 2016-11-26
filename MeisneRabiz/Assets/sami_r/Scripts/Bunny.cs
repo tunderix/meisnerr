@@ -3,12 +3,21 @@ using System.Collections;
 
 public class Bunny : MonoBehaviour {
 
-	//State from 0...1 --> initial 0-0.5
-	public float state;
+    public delegate void OnDied(Bunny bunny);
+    public event OnDied onDied;
+
+    //State from 0...1 --> initial 0-0.5
+    public float state;
 	public float stateChangeSpeed;
 	private int direction = 1 ; // 1 == incrementing, -1 decrementing
 
+    
     public float forceAmmount;
+
+    public Renderer render;
+
+    public float tempPerCollision;
+    float temperature = 0.0f;
 
     private float angle; 
 	private Vector3 position; 
@@ -20,25 +29,10 @@ public class Bunny : MonoBehaviour {
 	void Start () {
 		initialize ();
         StartCoroutine(pulsingMovement());
-		Debug.Log ("Mrrlrlrlrlll --> I Am HERE!!");
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		//if (direction == 0) {
-		//	if (state < 1) {
-		//		state = state + (1 * stateChangeSpeed);
-		//	} else {
-		//		direction = 1;
-		//	}
-
-		//}else if (direction == 1) {
-		//	if (state > 0) {
-		//		state = state - (1 * stateChangeSpeed);
-		//	} else {
-		//		direction = 0;
-		//	}
-		//}
 
         state += stateChangeSpeed * direction;
         if (state < 0.0f || state > 1.0f)
@@ -49,6 +43,12 @@ public class Bunny : MonoBehaviour {
         if (debugEnabled) {
 			Debug.Log ("State changin: " + this.state);
 		}
+
+        if (transform.position.y < -10.0f)
+        {
+            if (onDied != null)
+                onDied(this);
+        }
 	}
 
 	private void initialize () {
@@ -66,8 +66,35 @@ public class Bunny : MonoBehaviour {
             Vector3 force = Random.onUnitSphere;
             force.y = Mathf.Abs(force.y);
 
-            rb.AddForce(force * forceAmmount);
+            force.y = 0.0f;
+
+            rb.AddForce(force.normalized * forceAmmount);
             yield return new WaitForSeconds(Random.Range(0.5f, 1.5f));
+        }
+    }
+
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("bunny"))
+        {
+            Debug.Log("---OnTriggerEnter---Bunny---");
+            temperature += tempPerCollision;
+            Color c = Color.Lerp(Color.green, Color.red, temperature);
+            Material[] mats = render.materials;
+            mats[0].color = c;
+            mats[1].color = c;
+            render.materials = mats;
+        }
+        else if (collision.gameObject.CompareTag("pylon"))
+        {
+            Debug.Log("---OnTriggerEnter---pylon---");
+            temperature += tempPerCollision *1.5f;
+            Color c = Color.Lerp(Color.green, Color.red, temperature);
+            Material[] mats = render.materials;
+            mats[0].color = c;
+            mats[1].color = c;
+            render.materials = mats;
         }
     }
 
