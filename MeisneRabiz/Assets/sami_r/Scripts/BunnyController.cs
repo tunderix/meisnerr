@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class BunnyController : MonoBehaviour {
 
 	public GameObject bunnyPrefab;
+    public Collider floorCollider;
 
 	//Parameters for spawning new bunnies! 
 	public int quantity;
@@ -13,7 +14,7 @@ public class BunnyController : MonoBehaviour {
 
     //Parameters for handling bunnies.
     private List<Bunny> mBunnies = new List<Bunny>();
-    private List<Bunny> bunnies { get { return mBunnies; } }
+    public List<Bunny> bunnies { get { return mBunnies; } }
 
 
     void Start () {
@@ -90,6 +91,23 @@ public class BunnyController : MonoBehaviour {
             rb.AddForce(-pos * 50f);
 
             yield return new WaitForSeconds(interval);
+        }
+    }
+
+
+    public void shootCold(Vector3 screenpoint)
+    {
+        Ray ray = Camera.main.ScreenPointToRay(screenpoint);
+
+        RaycastHit hit;
+        if(floorCollider.Raycast(ray, out hit, 100.0f))
+        {
+            Vector3 point = ray.GetPoint(hit.distance);
+
+            // temp sphere to see where hit
+            GameObject s = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            s.transform.position = point;
+            Destroy(s, 1.0f);
         }
     }
 
