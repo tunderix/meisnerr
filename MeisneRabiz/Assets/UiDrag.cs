@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class UiDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    public delegate void OnDragend(UiDrag drag);
+    public event OnDragend onDragend;
+
     Vector3 startPosition;
     Image img;
 
@@ -41,6 +44,9 @@ public class UiDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     {
         setRaycast(true);
         MoveToLocal(startPosition);
+
+        if (onDragend != null)
+            onDragend(this);
     }
 
     public void MoveToLocal(Vector3 target, float time = 0.5f)

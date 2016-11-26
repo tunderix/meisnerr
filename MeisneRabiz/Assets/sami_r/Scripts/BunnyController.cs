@@ -107,6 +107,7 @@ public class BunnyController : MonoBehaviour {
             // temp sphere to see where hit
             GameObject s = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             s.transform.position = point;
+            s.transform.localScale = Vector3.one * 5.0f;
             Destroy(s, 1.0f);
         }
     }
