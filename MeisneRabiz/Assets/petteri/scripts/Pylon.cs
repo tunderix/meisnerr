@@ -1,13 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum PylonState
+{
+    s0,
+    s1
+}
+
 public class Pylon : MonoBehaviour {
 
-    [Range(0.0f,1.0f)]
-    public float state = 0.0f;
+    public PylonState state = PylonState.s0;
 
-    public float rotSpeed = 0.0f;
+    public Pylon pylonLeft;
+    public Pylon pylonRigth;
+
     private Vector3 angle;
+    public float angleY { get { return angle.y; } }
+
 
     void Awake()
     {
@@ -21,7 +30,7 @@ public class Pylon : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        angle.y += rotSpeed * Time.deltaTime;
+        angle.y += 2.0f * Time.deltaTime;
         transform.localEulerAngles = angle;
     }
 
