@@ -21,6 +21,7 @@ public class Bunny : MonoBehaviour {
     public Renderer render;
 
     public float tempPerCollision;
+    public float tempRiseSpeed;
     float mTemperature = 0.0f;
     public float temperature { get { return mTemperature; } }
 
@@ -36,7 +37,8 @@ public class Bunny : MonoBehaviour {
 	void Start () {
         initialize ();
         StartCoroutine(pulsingMovement());
-        enableMayPair(0.2f);
+        mayPair = false;
+        disableMayPairFor(1.0f);
     }
 	
 	// Update is called once per frame
@@ -47,6 +49,8 @@ public class Bunny : MonoBehaviour {
             direction *= -1;
 
         state = Mathf.Clamp01(state);
+
+        setTemperature(mTemperature + tempRiseSpeed*Time.deltaTime);
 
         if (debugEnabled) {
 			Debug.Log ("State changin: " + this.state);
@@ -84,10 +88,15 @@ public class Bunny : MonoBehaviour {
 
             force.y = 0.0f;
 
-            rb.AddForce(force.normalized * forceAmmount);
+            addForce(force.normalized * forceAmmount);
             animator.SetTrigger("run");
             yield return new WaitForSeconds(Random.Range(1.0f, 2.5f));
         }
+    }
+
+    public void addForce(Vector3 force)
+    {
+        rb.AddForce(force);
     }
 
 
@@ -113,42 +122,52 @@ public class Bunny : MonoBehaviour {
     {
         if (collision.gameObject.CompareTag("bunny"))
         {
-            Debug.Log("---OnTriggerEnter---Bunny---");
+            //Debug.Log("---OnTriggerEnter---Bunny---");
             setTemperature(mTemperature + tempPerCollision);
             animator.SetTrigger("knockback");
             animator.SetTrigger("run");
-
+            
             Bunny other = collision.gameObject.GetComponent<Bunny>();
-            if(mayPair && other.mayPair && mTemperature < pairingThreshold && other.mTemperature < pairingThreshold)
+
+            //Debug.Log("------mayPair"+ mayPair+" other.mayPair:"+ other.mayPair + " mTemperature:"+ mTemperature + " other.mTemperature:" + other.mTemperature);
+
+            if (mayPair && other.mayPair && mTemperature < pairingThreshold && other.mTemperature < pairingThreshold)
             {
+                Debug.Log("--------PAIRING-----");
                 if (onPairing != null)
                     onPairing(this);
 
-                enableMayPair(0.2f);
+                disableMayPairFor(0.5f);
             }
 
         }
         else if (collision.gameObject.CompareTag("pylon"))
         {
-            Debug.Log("---OnTriggerEnter---pylon---");
+            //Debug.Log("---OnTriggerEnter---pylon---");
             setTemperature(mTemperature + tempPerCollision * 1.5f);
             animator.SetTrigger("knockback");
             animator.SetTrigger("run");
         }
     }
 
-    Coroutine enableMayPairCo;
-    void enableMayPair(float delay)
+    Coroutine disableMayPairForCo;
+    void disableMayPairFor(float time)
     {
-        if (enableMayPairCo != null)
-            StopCoroutine(enableMayPairCo);
+        Debug.Log("--------disableMayPairFor-----");
+        if (disableMayPairForCo != null)
+            StopCoroutine(disableMayPairForCo);
 
-        enableMayPairCo = StartCoroutine(doEnableMayPair(delay));
+        disableMayPairForCo = StartCoroutine(doDisableMayPairFor(time));
     }
 
-    IEnumerator doEnableMayPair(float delay)
+    IEnumerator doDisableMayPairFor(float time)
     {
-        yield return new WaitForSeconds(delay);
+        Debug.Log("--------doDisableMayPairFor-----");
+        yield return null;
+        mayPair = false;
+        Debug.Log("--------mayPair-FALSE-----");
+        yield return new WaitForSeconds(time);
         mayPair = true;
+        Debug.Log("--------mayPair-TRUE-----");
     }
 }

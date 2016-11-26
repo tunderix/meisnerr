@@ -5,6 +5,7 @@ public class PylonDrag : MonoBehaviour {
 
     public Pylon pylon;
     public float sensitivity = 2.0f;
+    public float dragThreshold;
 
     Plane mDragPlane;
 
@@ -51,6 +52,24 @@ public class PylonDrag : MonoBehaviour {
 
             prevPoint = point;
         }
+    }
+
+    void OnMouseUp()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        float distance;
+        if (mDragPlane.Raycast(ray, out distance))
+        {
+            Vector3 point = ray.GetPoint(distance);
+            Vector3 dif = point - startPoint;
+
+            if (dif.magnitude <= dragThreshold)
+            {
+                pylon.pylonPressed();
+            }
+        }
+
     }
 
 }

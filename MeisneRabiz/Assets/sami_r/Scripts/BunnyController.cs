@@ -70,8 +70,14 @@ public class BunnyController : MonoBehaviour {
 
     void bunnyPaired(Bunny bunny)
     {
-        Debug.Log("-------------bunnyPaired----------------");
-        GenerateBunny(bunny.transform.position);
+        //Debug.Log("-------------bunnyPaired----------------");
+
+        Vector3 offset = Random.onUnitSphere;
+        offset.y = 0.0f;
+        offset.Normalize();
+        offset = offset * 2.0f;
+
+        GenerateBunny(bunny.transform.position + offset);
     }
 
 	//generate 3D position on top of game area! 

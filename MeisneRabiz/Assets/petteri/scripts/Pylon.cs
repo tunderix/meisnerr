@@ -9,6 +9,9 @@ public enum PylonType
 
 public class Pylon : MonoBehaviour {
 
+    public delegate void OnPressed(Pylon pylon);
+    public event OnPressed onPressed;
+
     [Range(0.0f,1.0f)]
     public float state = 0.0f;
     public PylonType type = PylonType.type1;
@@ -132,4 +135,14 @@ public class Pylon : MonoBehaviour {
             }
         }
     }
+
+
+    public void pylonPressed()
+    {
+        if (onPressed != null)
+        {
+            onPressed(this);
+        }
+    }
+
 }
