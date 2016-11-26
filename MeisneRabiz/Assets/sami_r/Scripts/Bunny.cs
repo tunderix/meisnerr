@@ -8,7 +8,13 @@ public class Bunny : MonoBehaviour {
 	public float stateChangeSpeed;
 	private int direction = 1 ; // 1 == incrementing, -1 decrementing
 
+    
     public float forceAmmount;
+
+    public Renderer render;
+
+    public float tempPerCollision;
+    float temperature = 0.0f;
 
     private float angle; 
 	private Vector3 position; 
@@ -20,25 +26,10 @@ public class Bunny : MonoBehaviour {
 	void Start () {
 		initialize ();
         StartCoroutine(pulsingMovement());
-		Debug.Log ("Mrrlrlrlrlll --> I Am HERE!!");
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		//if (direction == 0) {
-		//	if (state < 1) {
-		//		state = state + (1 * stateChangeSpeed);
-		//	} else {
-		//		direction = 1;
-		//	}
-
-		//}else if (direction == 1) {
-		//	if (state > 0) {
-		//		state = state - (1 * stateChangeSpeed);
-		//	} else {
-		//		direction = 0;
-		//	}
-		//}
 
         state += stateChangeSpeed * direction;
         if (state < 0.0f || state > 1.0f)
@@ -70,8 +61,25 @@ public class Bunny : MonoBehaviour {
             Vector3 force = Random.onUnitSphere;
             force.y = Mathf.Abs(force.y);
 
-            rb.AddForce(force * forceAmmount);
+            force.y = 0.0f;
+
+            rb.AddForce(force.normalized * forceAmmount);
             yield return new WaitForSeconds(Random.Range(0.5f, 1.5f));
+        }
+    }
+
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("bunny"))
+        {
+            Debug.Log("---OnTriggerEnter---Bunny---");
+            temperature += tempPerCollision;
+            Material[] sharedMats = render.sharedMaterials;
+            Material[] mats = render.materials;
+            mats[0] = sharedMats[0];
+            mats[1].color = Color.Lerp(Color.green, Color.red, temperature);
+            render.materials = mats;
         }
     }
 
