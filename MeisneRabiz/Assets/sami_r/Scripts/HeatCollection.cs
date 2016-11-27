@@ -11,14 +11,12 @@ public class HeatCollection : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+
+		this.setRandomTexture ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyUp(KeyCode.A)) {
-			this.setRandomTexture ();
-		}
 	}
 
 	void setRandomTexture(){

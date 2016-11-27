@@ -133,7 +133,7 @@ public class Bunny : MonoBehaviour {
 
             if (mayPair && other.mayPair && mTemperature < pairingThreshold && other.mTemperature < pairingThreshold)
             {
-                Debug.Log("--------PAIRING-----");
+                //Debug.Log("--------PAIRING-----");
                 if (onPairing != null)
                     onPairing(this);
 
@@ -153,7 +153,7 @@ public class Bunny : MonoBehaviour {
     Coroutine disableMayPairForCo;
     void disableMayPairFor(float time)
     {
-        Debug.Log("--------disableMayPairFor-----");
+        //Debug.Log("--------disableMayPairFor-----");
         if (disableMayPairForCo != null)
             StopCoroutine(disableMayPairForCo);
 
@@ -162,12 +162,12 @@ public class Bunny : MonoBehaviour {
 
     IEnumerator doDisableMayPairFor(float time)
     {
-        Debug.Log("--------doDisableMayPairFor-----");
+        //Debug.Log("--------doDisableMayPairFor-----");
         yield return null;
         mayPair = false;
-        Debug.Log("--------mayPair-FALSE-----");
+        //Debug.Log("--------mayPair-FALSE-----");
         yield return new WaitForSeconds(time);
         mayPair = true;
-        Debug.Log("--------mayPair-TRUE-----");
+        //Debug.Log("--------mayPair-TRUE-----");
     }
 }

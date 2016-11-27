@@ -87,7 +87,7 @@ public class BunnyController : MonoBehaviour {
 		//Vector3 position = levitatingTerrain.transform.position;
 		randomPos.y = bunnyPrefab.transform.position.y;
 
-		Debug.Log ("Generating random pos: " + randomPos.ToString());
+		//Debug.Log ("Generating random pos: " + randomPos.ToString());
 		return randomPos;
 	}
 

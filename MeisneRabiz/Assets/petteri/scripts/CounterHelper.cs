@@ -7,12 +7,15 @@ public class CounterHelper : MonoBehaviour {
 
     public BunnyController bunnyController;
     public Text countText;
+	public Text mostText;
 
     private int bunnyCount;
+	public int mostCount; 
 
 	// Use this for initialization
 	void Start () {
         bunnyCount = 0;
+		mostCount = 0; 
         if(bunnyController != null)
         {
             bunnyCount = bunnyController.bunnies.Count;
@@ -29,6 +32,15 @@ public class CounterHelper : MonoBehaviour {
                 countText.text = "x " + newCount;
                 bunnyCount = newCount;
             }
+
+			if (newCount > mostCount) {
+				mostCount = newCount;
+			}
+
+
+			mostText.text = "MOST: " + mostCount;
         }
 	}
+
+
 }

@@ -4,7 +4,10 @@ using System.Collections;
 public class HeatSpot : MonoBehaviour {
 
 	public int amountOfHeat;
+	public GameObject heatController;
 
+
+	public Vector3 pos;
 	// Use this for initialization
 	void Start () {
 		amountOfHeat = 0; 
@@ -26,7 +29,7 @@ public class HeatSpot : MonoBehaviour {
 	}
 
 	private void checkUpVolume () {
-		if (amountOfHeat > 10) {
+		if (amountOfHeat > 30) {
 			//Spot is heating up, launch Hot Spot!
 			spawnHeatMarker();
 		}
@@ -45,13 +48,12 @@ public class HeatSpot : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider other) {
-		Debug.Log ("I want TRIGGER");
 		if (other.tag == "bunny") {
-			Heat (3);
+			Heat (2);
 		}
 	}
 
 	void spawnHeatMarker(){
-		GameObject heatMarker = (GameObject)Instantiate (Resources.Load("HeatCollection"));
+		Instantiate(heatController, pos, Quaternion.identity);
 	}
 }
