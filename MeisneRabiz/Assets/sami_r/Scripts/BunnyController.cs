@@ -6,6 +6,7 @@ public class BunnyController : MonoBehaviour {
 
 	public GameObject bunnyPrefab;
     public Collider floorCollider;
+    public GameObject bunnyDeathParticlePrefab;
 
 	//Parameters for spawning new bunnies! 
 	public int quantity;
@@ -65,7 +66,13 @@ public class BunnyController : MonoBehaviour {
         bunny.onDied -= bunnyDied;
         bunny.onPairing += bunnyPaired;
         mBunnies.Remove(bunny);
-        Destroy(bunny.gameObject);
+        
+
+        GameObject particleGo = Instantiate(bunnyDeathParticlePrefab);
+        particleGo.transform.position = bunny.transform.position;
+
+        Destroy(bunny.gameObject, 0.1f);
+        Destroy(particleGo, 1.0f);
     }
 
     void bunnyPaired(Bunny bunny)

@@ -17,7 +17,7 @@ public class PylonController : MonoBehaviour {
     void Start () {
         mPylons = new List<Pylon>();
         CreatePylon(pylonCount);
-        StartCoroutine(randomPylonStateChange());
+        //StartCoroutine(randomPylonStateChange());
     }
 	
 	// Update is called once per frame
@@ -36,7 +36,9 @@ public class PylonController : MonoBehaviour {
 
             Pylon pylon = pylonGo.GetComponent<Pylon>();
             mPylons.Add(pylon);
-            pylon.state = i % 2;
+            //pylon.state = i % 2;
+            pylon.state = 0.0f;
+            pylon.type = PylonType.type1;
 
             pylon.onPressed += pylonPressed;
 
@@ -54,16 +56,16 @@ public class PylonController : MonoBehaviour {
         mPylons[count - 1].pylonRigth = mPylons[0];
     }
 
-    IEnumerator randomPylonStateChange()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(Random.Range(3.0f, 6.0f));
+    //IEnumerator randomPylonStateChange()
+    //{
+    //    while (true)
+    //    {
+    //        yield return new WaitForSeconds(Random.Range(3.0f, 6.0f));
 
-            Pylon pylon = mPylons[Random.Range(0, mPylons.Count)];
-            pylon.changePylonState(Random.value > 0.4f, 10.0f);
-        }
-    }
+    //        Pylon pylon = mPylons[Random.Range(0, mPylons.Count)];
+    //        pylon.changePylonState(Random.value > 0.4f, 10.0f);
+    //    }
+    //}
 
 
     void pylonPressed(Pylon pylon)
