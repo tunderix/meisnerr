@@ -21,6 +21,12 @@ public class Pylon : MonoBehaviour {
 
     public float rotateSpeed = 2.0f;
 
+    public GameObject colliderGo;
+    private Vector3 colliderScale;
+
+    public Renderer pylonEffectRenderer;
+    Material pylonEffectMateria;
+
     private Vector3 angle;
     public float angleY {
         get {
@@ -36,12 +42,14 @@ public class Pylon : MonoBehaviour {
     void Awake()
     {
         angle = transform.localEulerAngles;
+        colliderScale = colliderGo.transform.localScale;
+        pylonEffectMateria = pylonEffectRenderer.material;
     }
 
 	// Use this for initialization
 	void Start () {
-	
-	}
+        setState(state);
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -73,76 +81,59 @@ public class Pylon : MonoBehaviour {
         transform.localEulerAngles = angle;
     }
 
-    Coroutine chargeCo;
-    public void changePylonState(bool onOff, float time)
+
+    void setState(float newState)
     {
-        if (onOff)
-            chargePylon(time);
-        else
-            dischargePylon(time);
+        state = Mathf.Clamp01(newState);
+        colliderScale.z = 1.0f + state * 2;
+        colliderGo.transform.localScale = colliderScale;
+        pylonEffectMateria.SetFloat("_Multiplier", state);
     }
 
-    public void chargePylon(float time)
-    {
-        if(chargeCo != null)
-        {
-            StopCoroutine(chargeCo);
-        }
-
-        chargeCo = StartCoroutine(doChargePylon(time));
-    }
-
-    IEnumerator doChargePylon(float time)
-    {
-        if(type == PylonType.type1)
-        {
-            yield return new WaitForSeconds(time);
-            state = 1.0f;
-        }
-        else if(type == PylonType.type2)
-        {
-            while (state < 1.0f)
-            {
-                state += Time.deltaTime / time;
-                yield return null;
-            }
-        }
-    }
-
-    public void dischargePylon(float time)
-    {
-        if (chargeCo != null)
-        {
-            StopCoroutine(chargeCo);
-        }
-
-        chargeCo = StartCoroutine(doDischargePylon(time));
-    }
-
-    IEnumerator doDischargePylon(float time)
+    Coroutine pylonPressedCo;
+    IEnumerator doPylonPressed()
     {
         if (type == PylonType.type1)
         {
-            yield return new WaitForSeconds(time);
-            state = 0.0f;
-        }
-        else if (type == PylonType.type2)
-        {
-            while (state > 0.0f)
+            float time = 3.0f;
+            float t = 0.0f;
+            while (t < 1.0f)
             {
-                state -= Time.deltaTime / time;
+                t += Time.deltaTime / time;
+                setState(Mathf.Lerp(0.0f, 1.0f, t));
+
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(5.0f);
+
+            time = 1.0f;
+            t = 0.0f;
+            while (t < 1.0f)
+            {
+                t += Time.deltaTime / time;
+                setState(Mathf.Lerp(1.0f, 0.0f, t));
+
                 yield return null;
             }
         }
+        else if (type == PylonType.type2)
+        {
+            setState(1.0f);
+            yield return new WaitForSeconds(2.5f);
+            setState(0.0f);
+        }
+
+        pylonPressedCo = null;
     }
+
+
 
 
     public void pylonPressed()
     {
-        if (onPressed != null)
-        {
-            onPressed(this);
-        }
+        if (pylonPressedCo == null)
+            pylonPressedCo = StartCoroutine(doPylonPressed());
     }
 
 }

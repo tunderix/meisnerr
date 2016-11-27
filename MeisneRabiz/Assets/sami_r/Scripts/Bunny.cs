@@ -32,9 +32,12 @@ public class Bunny : MonoBehaviour {
     public Animator animator;
     private bool mayPair = false;
 
+    Material[] renderMaterials;
+
     public bool debugEnabled;
 	// Use this for initialization
 	void Start () {
+        renderMaterials = render.materials;
         initialize ();
         StartCoroutine(pulsingMovement());
         mayPair = false;
@@ -103,11 +106,10 @@ public class Bunny : MonoBehaviour {
     void setTemperature(float temperature)
     {
         mTemperature = Mathf.Clamp01(temperature);
-        Color c = Color.Lerp(Color.green, Color.red, temperature);
-        Material[] mats = render.materials;
-        mats[0].color = c;
-        mats[1].color = c;
-        render.materials = mats;
+        
+        renderMaterials[0].SetFloat("_Multiplier", mTemperature);
+        renderMaterials[1].SetFloat("_Multiplier", mTemperature);
+        render.materials = renderMaterials;
 
         if (mTemperature >= 1.0f && onDied != null)
             onDied(this);
@@ -133,7 +135,6 @@ public class Bunny : MonoBehaviour {
 
             if (mayPair && other.mayPair && mTemperature < pairingThreshold && other.mTemperature < pairingThreshold)
             {
-                //Debug.Log("--------PAIRING-----");
                 if (onPairing != null)
                     onPairing(this);
 
@@ -153,7 +154,6 @@ public class Bunny : MonoBehaviour {
     Coroutine disableMayPairForCo;
     void disableMayPairFor(float time)
     {
-        //Debug.Log("--------disableMayPairFor-----");
         if (disableMayPairForCo != null)
             StopCoroutine(disableMayPairForCo);
 
@@ -162,12 +162,9 @@ public class Bunny : MonoBehaviour {
 
     IEnumerator doDisableMayPairFor(float time)
     {
-        //Debug.Log("--------doDisableMayPairFor-----");
         yield return null;
         mayPair = false;
-        //Debug.Log("--------mayPair-FALSE-----");
         yield return new WaitForSeconds(time);
         mayPair = true;
-        //Debug.Log("--------mayPair-TRUE-----");
     }
 }
