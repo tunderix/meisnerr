@@ -8,7 +8,8 @@ public class UiDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     public delegate void OnDragend(UiDrag drag);
     public event OnDragend onDragend;
 
-    Vector3 startPosition;
+    Vector3 mStartPosition;
+    public Vector3 startPosition { get { return mStartPosition; } }
     Image img;
 
     void Awake()
@@ -31,7 +32,7 @@ public class UiDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        startPosition = transform.localPosition;
+        mStartPosition = transform.localPosition;
         setRaycast(false);
     }
 
@@ -43,13 +44,12 @@ public class UiDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     public void OnEndDrag(PointerEventData eventData)
     {
         setRaycast(true);
-        MoveToLocal(startPosition);
 
         if (onDragend != null)
             onDragend(this);
     }
 
-    public void MoveToLocal(Vector3 target, float time = 0.5f)
+    public void MoveToLocal(Vector3 target, float time = 0.2f)
     {
         StopAllCoroutines();
         StartCoroutine(DoMove(target, time));

@@ -6,6 +6,7 @@ public class PylonController : MonoBehaviour {
 
     public GameObject pylonPrefab;
     public int pylonCount;
+    public BunnyController bunnyCont;
 
     List<Pylon> mPylons;
     public List<Pylon> pylons {
@@ -37,6 +38,8 @@ public class PylonController : MonoBehaviour {
             mPylons.Add(pylon);
             pylon.state = i % 2;
 
+            pylon.onPressed += pylonPressed;
+
             rot = i * (360 / count);
             pylon.setRotateY(rot);
 
@@ -59,6 +62,25 @@ public class PylonController : MonoBehaviour {
 
             Pylon pylon = mPylons[Random.Range(0, mPylons.Count)];
             pylon.changePylonState(Random.value > 0.4f, 10.0f);
+        }
+    }
+
+
+    void pylonPressed(Pylon pylon)
+    {
+        Vector3 pylonPos = pylon.transform.rotation * new Vector3(-14.0f, 1.3f, 0.0f);
+        Vector3 f = -pylonPos;
+        f.y = 0.0f;
+        f.Normalize();
+
+        Debug.DrawLine(pylonPos, new Vector3(0, 1.3f, 0), Color.red, 1.0f);
+
+        foreach (Bunny b in bunnyCont.bunnies)
+        {
+            if(Vector3.Distance(b.transform.position, pylonPos) < 8.0f)
+            {
+                b.addForce(f * b.forceAmmount*2);
+            }
         }
     }
 
