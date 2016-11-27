@@ -26,7 +26,6 @@ Shader "Shader Forge/sdr_Meisnerabbit" {
             #define UNITY_PASS_FORWARDBASE
             #include "UnityCG.cginc"
             #pragma multi_compile_fwdbase_fullshadows
-            #pragma exclude_renderers gles3 metal d3d11_9x xbox360 xboxone ps3 ps4 psp2 
             #pragma target 3.0
             uniform float4 _Color;
             uniform float _Multiplier;

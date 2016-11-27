@@ -39,7 +39,6 @@ Shader "Shader Forge/sdr_Additive" {
             #include "UnityStandardBRDF.cginc"
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
-            #pragma exclude_renderers gles3 metal d3d11_9x xbox360 xboxone ps3 ps4 psp2 
             #pragma target 3.0
             uniform float4 _TimeEditor;
             uniform float _UVwidth;
@@ -77,16 +76,16 @@ Shader "Shader Forge/sdr_Additive" {
                 float3 viewReflectDirection = reflect( -viewDirection, normalDirection );
 ////// Lighting:
 ////// Emissive:
-                float4 node_953 = _Time + _TimeEditor;
+                float4 node_2975 = _Time + _TimeEditor;
                 float2 node_1604_tc_rcp = float2(1.0,1.0)/float2( _UVwidth, _UVheight );
                 float node_1604_ty = floor(_Tile * node_1604_tc_rcp.x);
                 float node_1604_tx = _Tile - _UVwidth * node_1604_ty;
                 float2 node_1604 = (i.uv0 + float2(node_1604_tx, node_1604_ty)) * node_1604_tc_rcp;
-                float2 node_7505 = (node_1604+node_953.g*float2(1,0));
+                float2 node_7505 = (node_1604+node_2975.g*float2(1,0));
                 float4 node_377 = tex2D(_node_3272,TRANSFORM_TEX(node_7505, _node_3272));
-                float2 node_7066 = (node_1604+node_953.g*float2(-1,0));
+                float2 node_7066 = (node_1604+node_2975.g*float2(-1,0));
                 float4 node_5541 = tex2D(_node_3272,TRANSFORM_TEX(node_7066, _node_3272));
-                float2 node_741 = (node_1604+node_953.g*float2(0.5,0));
+                float2 node_741 = (node_1604+node_2975.g*float2(0.5,0));
                 float4 node_5157 = tex2D(_node_3498,TRANSFORM_TEX(node_741, _node_3498));
                 float3 emissive = (_Multiplier*_node_4519.rgb*lerp(lerp(node_377.rgb,node_5541.rgb,node_5541.rgb),node_5157.rgb,node_5157.rgb));
                 float3 finalColor = emissive;
