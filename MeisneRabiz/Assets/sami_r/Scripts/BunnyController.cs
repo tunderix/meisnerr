@@ -4,9 +4,13 @@ using System.Collections.Generic;
 
 public class BunnyController : MonoBehaviour {
 
-	public GameObject bunnyPrefab;
+    public GameObject bunnyPrefab;
     public Collider floorCollider;
     public GameObject bunnyDeathParticlePrefab;
+
+    public Bunny BigBunny;
+
+    public EndDialogHandler endDialog;
 
 	//Parameters for spawning new bunnies! 
 	public int quantity;
@@ -21,7 +25,9 @@ public class BunnyController : MonoBehaviour {
     void Start () {
 		SpawnBunnies ();
         StartCoroutine(spawnMoreBunnies(1.5f));
-	}
+        BigBunny.onDied += bunnyDied;
+        mBunnies.Add(BigBunny);
+    }
 
 	// Update is called once per frame
 	void Update () {
@@ -67,9 +73,13 @@ public class BunnyController : MonoBehaviour {
         bunny.onPairing += bunnyPaired;
         mBunnies.Remove(bunny);
         
-
         GameObject particleGo = Instantiate(bunnyDeathParticlePrefab);
         particleGo.transform.position = bunny.transform.position;
+
+        if(bunny == BigBunny)
+        {
+            endDialog.show();
+        }
 
         Destroy(bunny.gameObject, 0.1f);
         Destroy(particleGo, 1.0f);
@@ -115,7 +125,7 @@ public class BunnyController : MonoBehaviour {
     }
 
 
-    public void shootCold(Vector3 screenpoint)
+    public void shootCold(Vector3 screenpoint, GameObject particles)
     {
         Ray ray = Camera.main.ScreenPointToRay(screenpoint);
 
@@ -123,6 +133,11 @@ public class BunnyController : MonoBehaviour {
         if(floorCollider.Raycast(ray, out hit, 100.0f))
         {
             Vector3 point = ray.GetPoint(hit.distance);
+
+            //particles.transform.localScale = Vector3.one * 0.2f;
+            particles.transform.position = point;
+            particles.GetComponentInChildren<ParticleSystem>().Play();
+            Destroy(particles, 1.0f);
 
             // cool near bunnies down
             foreach (Bunny bunny in bunnies)
@@ -138,6 +153,10 @@ public class BunnyController : MonoBehaviour {
             //s.transform.position = point;
             //s.transform.localScale = Vector3.one * 5.0f;
             //Destroy(s, 1.0f);
+        }
+        else
+        {
+            Destroy(particles);
         }
     }
 
